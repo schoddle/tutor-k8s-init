@@ -9,7 +9,7 @@
 #   - install kubectl
 #   -
 #------------------------------------------------------------------------------
-name: Tutor k8s init
+name: Open edX Tutor k8s init
 description: Github Action to configure Ubuntu environment for tutor k8s build & deploy workflows
 branding:
   icon: 'cloud'
