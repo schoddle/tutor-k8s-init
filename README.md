@@ -9,7 +9,7 @@
 
 # tutor-k8s-init
 
-Github Action to configure Ubuntu environment for tutor k8s build & deploy workflows. You should call this action once, at the beginning of your tutor build and/or deploy workflow. Calling this action ºmultiple times has no effect, other than to slow down your workflow.
+Github Action to configure Ubuntu environment for tutor k8s build & deploy workflows. You should call this action once, at the beginning of your tutor build and/or deploy workflow. Calling this action multiple times has no effect, other than to slow down your workflow.
 
 
 ## Usage:
