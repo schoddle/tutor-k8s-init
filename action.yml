@@ -32,7 +32,7 @@ runs:
     # install the latest version of python3 which is a prerequisite for running Tutor
     - name: Install packages
       shell: bash
-      run:
+      run: |-
         sudo apt install python3 python3-pip libyaml-dev
         sudo snap install yq
 
