@@ -17,7 +17,8 @@ branding:
 inputs:
   namespace:
     description: 'The Kubernetes namesapce to which the Open edX platform environment will be deployed. Example: openedx-prod'
-    required: true
+    required: false
+    default: UNASSIGNED
     type: string
 
 runs:
@@ -64,6 +65,7 @@ runs:
         echo tutor root: $(tutor config printroot)
 
     - name: Load additional environment specific settings
+      if: ${{ inputs.namespace != 'UNASSIGNED' }}
       shell: bash
       run: |-
         echo "TUTOR_ID=tutor-${{ inputs.namespace }}" >> $GITHUB_ENV
