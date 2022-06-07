@@ -20,38 +20,21 @@ inputs:
     required: false
     default: UNASSIGNED
     type: string
-
+  k8s-cluster-name:
+    description: 'The Kubernetes cluster to which the Open edX platform environment will be deployed. Example: yourorg-global-live'
+    required: false
+    default: UNASSIGNED
+    type: string
 runs:
   using: "composite"
   steps:
-    # get the Kubernetes kubeconfig for our cluster. This is a prerequisite to getting any other data about or contained within our cluster.
-    # see: https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/
-    #
-    # summarizing: the kubeconfig (Kubernetes Configuration) is a text file that contains at a minimum
-    # three values that are necessary in order to access the Kubernetes cluster using kubectl command line:
-    #   - API server endpoint
-    #   - EKS Cluster ARN
-    #   - Certificate authority (ie the private ssh key)
-    - name: Install and configure kubectl
-      shell: bash
-      run: |-
-        sudo snap install kubectl --channel=1.23/stable --classic
-        sudo snap install yq
-        aws eks --region us-east-2 update-kubeconfig --name mrionline-global-live --alias eks-prod
-
-    - name: Check environments versions
-      shell: bash
-      run: |-
-        echo "kubectl version:"
-        kubectl version --short
-        echo
-        echo "aws cli version:"
-        aws --version
 
     # install the latest version of python3 which is a prerequisite for running Tutor
-    - name: Setup Python
+    - name: Install packages
       shell: bash
-      run: sudo apt install python3 python3-pip libyaml-dev
+      run:
+        sudo apt install python3 python3-pip libyaml-dev
+        sudo snap install yq
 
     # install Tutor which we'll use for configuring and deploying Open edX
     - name: Install Tutor
@@ -63,6 +46,31 @@ runs:
 
         echo "TUTOR_VERSION=$(tutor --version | cut -f3 -d' ')" >> $GITHUB_ENV
         echo tutor root: $(tutor config printroot)
+
+    # get the Kubernetes kubeconfig for our cluster. This is a prerequisite to getting any other data about or contained within our cluster.
+    # see: https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/
+    #
+    # summarizing: the kubeconfig (Kubernetes Configuration) is a text file that contains at a minimum
+    # three values that are necessary in order to access the Kubernetes cluster using kubectl command line:
+    #   - API server endpoint
+    #   - EKS Cluster ARN
+    #   - Certificate authority (ie the private ssh key)
+    - name: Install and configure kubectl
+      if: ${{ inputs.k8s-cluster-name != 'UNASSIGNED' }}
+      shell: bash
+      run: |-
+        sudo snap install kubectl --channel=1.23/stable --classic
+        aws eks --region us-east-2 update-kubeconfig --name ${{ inputs.k8s-cluster-name }} --alias ${{ inputs.k8s-cluster-name }}
+
+    - name: Check environments versions
+      if: ${{ inputs.k8s-cluster-name != 'UNASSIGNED' }}
+      shell: bash
+      run: |-
+        echo "kubectl version:"
+        kubectl version --short
+        echo
+        echo "aws cli version:"
+        aws --version
 
     - name: Load additional environment specific settings
       if: ${{ inputs.namespace != 'UNASSIGNED' }}
