@@ -25,6 +25,12 @@ inputs:
     required: false
     default: UNASSIGNED
     type: string
+  aws-region:
+    description: 'The AWS region in which the EKS cluster is hosted. Example: us-east-1'
+    required: false
+    default: us-east-1
+    type: string
+
 runs:
   using: "composite"
   steps:
@@ -47,6 +53,19 @@ runs:
         echo "TUTOR_VERSION=$(tutor --version | cut -f3 -d' ')" >> $GITHUB_ENV
         echo tutor root: $(tutor config printroot)
 
+    - name: Load tutor settings
+      shell: bash
+      run: |-
+        echo "TUTOR_RUN_CADDY=false" >> $GITHUB_ENV
+        echo "TUTOR_RUN_NGINX=false" >> $GITHUB_ENV
+
+    - name: Load additional environment specific settings
+      if: ${{ inputs.namespace != 'UNASSIGNED' }}
+      shell: bash
+      run: |-
+        echo "TUTOR_ID=tutor-${{ inputs.namespace }}" >> $GITHUB_ENV
+        echo "TUTOR_K8S_NAMESPACE=${{ inputs.namespace }}" >> $GITHUB_ENV
+
     # get the Kubernetes kubeconfig for our cluster. This is a prerequisite to getting any other data about or contained within our cluster.
     # see: https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/
     #
@@ -60,23 +79,20 @@ runs:
       shell: bash
       run: |-
         sudo snap install kubectl --channel=1.23/stable --classic
-        aws eks --region us-east-2 update-kubeconfig --name ${{ inputs.k8s-cluster-name }} --alias ${{ inputs.k8s-cluster-name }}
+        aws eks --region ${{ inputs.aws-region }} update-kubeconfig --name ${{ inputs.k8s-cluster-name }} --alias ${{ inputs.k8s-cluster-name }}
 
     - name: Check environments versions
       if: ${{ inputs.k8s-cluster-name != 'UNASSIGNED' }}
       shell: bash
       run: |-
+        echo "/home/runner/.kube/config"
+        cat /home/runner/.kube/config
+
+        echo
         echo "kubectl version:"
         kubectl version --short
+
         echo
+
         echo "aws cli version:"
         aws --version
-
-    - name: Load additional environment specific settings
-      if: ${{ inputs.namespace != 'UNASSIGNED' }}
-      shell: bash
-      run: |-
-        echo "TUTOR_ID=tutor-${{ inputs.namespace }}" >> $GITHUB_ENV
-        echo "TUTOR_RUN_CADDY=false" >> $GITHUB_ENV
-        echo "TUTOR_RUN_NGINX=false" >> $GITHUB_ENV
-        echo "TUTOR_K8S_NAMESPACE=${{ inputs.namespace }}" >> $GITHUB_ENV
