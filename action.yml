@@ -76,9 +76,16 @@ runs:
     #   - Certificate authority (ie the private ssh key)
     - name: Install and configure kubectl
       if: ${{ inputs.k8s-cluster-name != 'UNASSIGNED' }}
+      id: kubectl-install
+      uses: azure/setup-kubectl@v2.0
+      with:
+        version: 'v1.23.6'
+
+    - name: Configure kubectl
+      if: ${{ inputs.k8s-cluster-name != 'UNASSIGNED' }}
+      id: kubectl-configure
       shell: bash
       run: |-
-        sudo snap install kubectl --channel=1.23/stable --classic
         aws eks --region ${{ inputs.aws-region }} update-kubeconfig --name ${{ inputs.k8s-cluster-name }} --alias ${{ inputs.k8s-cluster-name }}
 
     - name: Check environments versions
