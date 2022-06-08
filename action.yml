@@ -7,7 +7,6 @@
 #   - install Python
 #   - install tutor
 #   - install kubectl
-#   -
 #------------------------------------------------------------------------------
 name: Open edX Tutor k8s init
 description: Github Action to configure Ubuntu environment for tutor k8s build & deploy workflows
@@ -15,7 +14,7 @@ branding:
   icon: 'cloud'
   color: 'orange'
 inputs:
-  namespace:
+  eks-namespace:
     description: 'The Kubernetes namesapce to which the Open edX platform environment will be deployed. Example: openedx-prod'
     required: false
     default: UNASSIGNED
@@ -34,12 +33,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install kubectl
-      if: ${{ inputs.eks-cluster-name != 'UNASSIGNED' }}
-      id: kubectl-install
-      uses: azure/setup-kubectl@v2.0
-      with:
-        version: 'v1.23.6'
+    # replaces: sudo snap install kubectl --channel=1.23/stable --classic
+    #- name: Install kubectl
+    #  if: ${{ inputs.eks-cluster-name != 'UNASSIGNED' }}
+    #  id: kubectl-install
+    #  uses: azure/setup-kubectl@v2.1
+    #  with:
+    #    version: 'v1.23.6'
 
     # get the Kubernetes kubeconfig for our cluster. This is a prerequisite to getting any other   data about or contained within our cluster.
     # see: https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/
@@ -54,15 +54,24 @@ runs:
       id: kubectl-configure
       shell: bash
       run: |-
+        sudo snap install kubectl --channel=1.23/stable --classic
         aws eks --region ${{ inputs.aws-region }} update-kubeconfig --name ${{ inputs.eks-cluster-name }} --alias ${{ inputs.eks-cluster-name }}
 
     - name: Check kubectl version
       if: ${{ inputs.eks-cluster-name != 'UNASSIGNED' }}
       shell: bash
       run: |-
+        echo "aws cli version:"
+        echo "----------------"
         aws --version
-        kubectl version --short
-
+        echo
+        echo "aws IAM user:"
+        echo "-------------"
+        aws sts get-caller-identity
+        echo
+        echo "kubectl version and diagnostic info:"
+        echo "------------------------------------"
+        kubectl version --short --v=9
 
     # install the latest version of python3 which is a prerequisite for running Tutor
     - name: Install packages required by tutor
@@ -78,7 +87,6 @@ runs:
         pip install --upgrade pyyaml
         pip install tutor
         tutor config save
-
         echo "TUTOR_VERSION=$(tutor --version | cut -f3 -d' ')" >> $GITHUB_ENV
         echo tutor root: $(tutor config printroot)
 
