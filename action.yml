@@ -57,8 +57,7 @@ runs:
         sudo snap install kubectl --channel=1.23/stable --classic
         aws eks --region ${{ inputs.aws-region }} update-kubeconfig --name ${{ inputs.eks-cluster-name }} --alias ${{ inputs.eks-cluster-name }}
 
-    - name: Check kubectl version
-      if: ${{ inputs.eks-cluster-name != 'UNASSIGNED' }}
+    - name: Check awscli version
       shell: bash
       run: |-
         echo "aws cli version:"
@@ -68,7 +67,11 @@ runs:
         echo "aws IAM user:"
         echo "-------------"
         aws sts get-caller-identity
-        echo
+
+    - name: Check kubectl version
+      if: ${{ inputs.eks-cluster-name != 'UNASSIGNED' }}
+      shell: bash
+      run: |-
         echo "kubectl version and diagnostic info:"
         echo "------------------------------------"
         kubectl version --short --v=9
