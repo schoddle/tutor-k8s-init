@@ -83,6 +83,15 @@ runs:
         sudo apt install python3 python3-pip libyaml-dev
         sudo snap install yq
 
+    # install latest version of yq
+    - name: Install yq
+      shell: bash
+      run: |-
+        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod a+x /usr/local/bin/yq
+        export PATH="/usr/local/bin/:$PATH"
+        yq --version
+
     # install Tutor which we'll use for configuring and deploying Open edX
     - name: Install Tutor
       shell: bash
