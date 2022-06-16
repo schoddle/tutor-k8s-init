@@ -9,8 +9,9 @@
 
 # tutor-k8s-init
 
-Github Action to configure Ubuntu environment for tutor k8s build & deploy workflows. You should call this action once, at the beginning of your tutor build and/or deploy workflow. Calling this action multiple times has no effect, other than to slow down your workflow.
+Github Action to configure the Ubuntu worker environment. Installs and configures awscli, tutor, kubectl, plus any other Linux packages that are used by other openedx-actions for build & deploy workflows. You should call this action once, at the beginning of your tutor build and/or deploy workflow. Calling this action more than once in your workflow is safe, but will have no affect other than to slow down your workflow.
 
+This action was originally created for [Cookiecutter Tutor Open edX Production Devops Tools](https://github.com/lpm0073/cookiecutter-openedx-devops) but it should also work with your own custom workflows.
 
 ## Usage:
 
@@ -38,5 +39,5 @@ jobs:
 
       # This action.
       - name: Configure Github workflow environment
-        uses: openedx-actions/tutor-k8s-init@v0.0.1
+        uses: openedx-actions/tutor-k8s-init@v1.0.0
 ```
