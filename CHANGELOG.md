@@ -1,6 +1,6 @@
 # CHANGE LOG
 
-## Version 1.0.1 (2022-06-23)
+## Version 1.0.2 (2022-06-23)
 
 ADD masks for sensitive data generated and echoed to the console by tutor during
 config, build and deploy operations
