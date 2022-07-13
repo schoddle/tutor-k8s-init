@@ -39,5 +39,5 @@ jobs:
 
       # This action.
       - name: Configure Github workflow environment
-        uses: openedx-actions/tutor-k8s-init@v1.0.2
+        uses: openedx-actions/tutor-k8s-init@v1.0.3
 ```
