@@ -96,7 +96,7 @@ runs:
       shell: bash
       run: |-
         pip install --upgrade pyyaml
-        pip install tutor
+        pip install tutor==14.0.2
         tutor config save
         echo "TUTOR_VERSION=$(tutor --version | cut -f3 -d' ')" >> $GITHUB_ENV
         echo tutor root: $(tutor config printroot)
