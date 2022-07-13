@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## Version 1.0.3 (2022-07-13)
+
+Add an input `tutor-version` and default to "14.0.2"
+
 ## Version 1.0.2 (2022-06-23)
 
 ADD masks for sensitive data generated and echoed to the console by tutor during
